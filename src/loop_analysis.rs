@@ -132,15 +132,15 @@ impl<Rng: RngFn> Analysis<Rng> {
         );
 
         for (id, l) in self.loops.iter().enumerate() {
-            println!("\n");
+            println!();
             let mut s = l.start;
             if l.period > 100 {
-                println!("Loop {id} (period {}) at {s:#x}", l.period);
+                println!("Loop {id} (period {}) at {s:#06x}", l.period);
             } else {
                 println!("Loop {id} (period {}):", l.period);
-                print!("{s:#x}");
+                print!("{s:#06x}");
                 for _ in 1..l.period {
-                    print!(", {s:#x}");
+                    print!(", {s:#06x}");
                     s = (self.rng)(s);
                 }
                 println!();
