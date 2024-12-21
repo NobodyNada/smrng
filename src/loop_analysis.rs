@@ -1,150 +1,154 @@
-use super::RngFn;
+use serde::Serialize;
 
-pub struct Analysis<Rng: RngFn> {
-    rng: Rng,
-    seeds: [SeedInfo; 0x1000],
-    branches: Vec<BranchInfo>,
-    loops: Vec<LoopInfo>,
+use crate::Rng;
+
+#[derive(Serialize)]
+pub struct Analysis {
+    pub rng: Rng,
+    pub seeds: Vec<SeedInfo>,
+    pub branches: Vec<BranchInfo>,
+    pub loops: Vec<LoopInfo>,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum SeedInfo {
     Branch { id: u16 },
     Loop { id: u16 },
 }
 
+#[derive(Serialize)]
 pub struct BranchInfo {
-    start: u16,
-    length: u16,
-    loop_id: u16,
+    pub seeds: Vec<u16>,
+    pub loop_id: u16,
 }
 
+#[derive(Serialize)]
 pub struct LoopInfo {
-    period: u16,
-    start: u16,
+    pub seeds: Vec<u16>,
 }
 
-pub fn analyze<Rng: RngFn>(rng: Rng) -> Analysis<Rng> {
-    let mut seeds = [Option::<SeedInfo>::None; 0x10000];
-    let mut branches = Vec::new();
-    let mut loops = Vec::new();
+impl Rng {
+    pub fn analyze(&self) -> Analysis {
+        let mut seeds = [Option::<SeedInfo>::None; 0x10000];
+        let mut branches = Vec::new();
+        let mut loops = Vec::new();
 
-    for start in 0..=0xFFFFu16 {
-        if seeds[start as usize].is_some() {
-            continue;
-        }
-
-        // Mark the generated values as a new branch
-        let mut s = start;
-        let mut length = 0;
-        let new_branch = SeedInfo::Branch {
-            id: branches.len() as u16,
-        };
-        while seeds[s as usize].is_none() {
-            seeds[s as usize] = Some(new_branch);
-            length += 1;
-            s = rng(s);
-        }
-
-        match seeds[s as usize] {
-            None => unreachable!(),
-            Some(SeedInfo::Loop { id }) => {
-                // We've found a new branch leading into an existing loop.
-                branches.push(BranchInfo {
-                    start,
-                    length,
-                    loop_id: id,
-                });
+        for start in std::iter::once(self.seed).chain(0..=0xFFFFu16) {
+            if seeds[start as usize].is_some() {
+                continue;
             }
-            Some(info) if info == new_branch => {
-                // We've found a new loop, possibly with a new branch leading up to it.
-                let new_loop = SeedInfo::Loop {
-                    id: loops.len() as u16,
-                };
 
-                // Determine the length of the loop.
-                let loop_start = s;
-                let mut period = 1;
-                s = rng(s);
-                seeds[s as usize] = Some(new_loop);
-                while s != loop_start {
-                    period += 1;
-                    s = rng(s);
-                    seeds[s as usize] = Some(new_loop);
-                }
+            // Mark the generated values as a new branch
+            let mut rng = self.with_seed(start);
+            let mut seeds_seen = Vec::new();
+            let new_branch = SeedInfo::Branch {
+                id: branches.len() as u16,
+            };
+            while seeds[rng.seed as usize].is_none() {
+                seeds[rng.seed as usize] = Some(new_branch);
+                seeds_seen.push(rng.seed);
+                rng.frame_advance();
+            }
 
-                // Determine the length of the branch leading up to the loop.
-                length = 0;
-                s = start;
-                while seeds[s as usize] == Some(new_branch) {
-                    length += 1;
-                    s = rng(s);
-                }
-
-                if length != 0 {
+            match seeds[rng.seed as usize] {
+                None => unreachable!(),
+                Some(SeedInfo::Loop { id }) => {
+                    // We've found a new branch leading into an existing loop.
                     branches.push(BranchInfo {
-                        start,
-                        length,
-                        loop_id: loops.len() as u16,
+                        seeds: seeds_seen,
+                        loop_id: id,
                     });
                 }
+                Some(info) if info == new_branch => {
+                    // We've found a new loop, possibly with a new branch leading up to it.
+                    let new_loop = SeedInfo::Loop {
+                        id: loops.len() as u16,
+                    };
 
-                loops.push(LoopInfo {
-                    period,
-                    start: loop_start,
-                })
-            }
-            suffix @ Some(SeedInfo::Branch { id }) => {
-                // We've found a prefix of an existing branch.
-                branches[id as usize].start = start;
-                branches[id as usize].length += length;
-                s = start;
-                for _ in 0..length {
-                    seeds[s as usize] = suffix;
-                    s = rng(s);
+                    // Determine the length of the loop.
+                    let (branch_seeds, loop_seeds) = seeds_seen.split_at(
+                        seeds_seen
+                            .iter()
+                            .enumerate()
+                            .find(|(_, seed)| **seed == rng.seed)
+                            .unwrap()
+                            .0,
+                    );
+                    for &seed in branch_seeds {
+                        seeds[seed as usize] = Some(new_branch);
+                    }
+                    for &seed in loop_seeds {
+                        seeds[seed as usize] = Some(new_loop);
+                    }
+
+                    if !branch_seeds.is_empty() {
+                        branches.push(BranchInfo {
+                            seeds: branch_seeds.to_vec(),
+                            loop_id: loops.len() as u16,
+                        });
+                    }
+
+                    loops.push(LoopInfo {
+                        seeds: loop_seeds.to_vec(),
+                    })
+                }
+                suffix @ Some(SeedInfo::Branch { id }) => {
+                    // We've found a prefix of an existing branch.
+                    for &seed in &seeds_seen {
+                        seeds[seed as usize] = suffix;
+                    }
+                    let branch = &mut branches[id as usize];
+                    seeds_seen.append(&mut branch.seeds);
+                    branches[id as usize].seeds = seeds_seen;
+                    rng.reseed(start);
                 }
             }
         }
-    }
 
-    Analysis {
-        rng,
-        seeds: std::array::from_fn(|s| seeds[s].unwrap()),
-        branches,
-        loops,
+        Analysis {
+            rng: self.clone(),
+            seeds: seeds.into_iter().map(Option::unwrap).collect(),
+            branches,
+            loops,
+        }
     }
 }
 
-impl<Rng: RngFn> Analysis<Rng> {
+impl Analysis {
     pub fn print(&self) {
-        println!(
-            "Loops: {} {:?}",
-            self.loops.len(),
-            self.loops.iter().map(|l| l.period).collect::<Vec<_>>()
-        );
-        println!(
-            "Branches: {} {:#?}",
-            self.branches.len(),
-            self.branches
-                .iter()
-                .map(|b| format!("{} -> {}", b.length, b.loop_id))
-                .collect::<Vec<_>>()
-        );
-
+        println!("Loop analysis for {:#?}", self.rng);
+        println!();
         for (id, l) in self.loops.iter().enumerate() {
-            println!();
-            let mut s = l.start;
-            if l.period > 100 {
-                println!("Loop {id} (period {}) at {s:#06x}", l.period);
+            let start = l.seeds[0];
+            let period = l.seeds.len();
+            if period > 100 {
+                println!("Loop {id} (period {period}) at {start:#06x}");
             } else {
-                println!("Loop {id} (period {}):", l.period);
-                print!("{s:#06x}");
-                for _ in 1..l.period {
-                    print!(", {s:#06x}");
-                    s = (self.rng)(s);
+                println!("Loop {id} (period {period}):");
+
+                const PER_LINE: usize = 10;
+                for (i, seed) in l.seeds.iter().enumerate() {
+                    if i % PER_LINE == 0 {
+                        print!("    ");
+                    }
+                    print!("{:#06x}", seed);
+                    if i == period - 1 || (i + 1) % PER_LINE == 0 {
+                        println!();
+                    } else {
+                        print!(", ");
+                    }
                 }
-                println!();
             }
+        }
+        println!();
+        println!("Branches: {}", self.branches.len());
+        for (i, branch) in self.branches.iter().enumerate() {
+            let pad = self.branches.len().ilog10() as usize + 1;
+            println!(
+                "    {i:pad$}: length {:5} -> loop {}",
+                branch.seeds.len(),
+                branch.loop_id
+            );
         }
     }
 }
