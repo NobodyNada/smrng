@@ -1,11 +1,8 @@
-use std::{num::ParseIntError, process::exit};
+use ::rng::*;
+use drops::{analysis::DropAnalysis, Drop, DropSet};
 
 use clap::{builder::BoolishValueParser, Parser, Subcommand};
-pub use rng::Rng;
-
-mod drops;
-mod loop_analysis;
-mod rng;
+use std::{collections::HashMap, num::ParseIntError, process::exit};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -17,9 +14,10 @@ struct Args {
     #[arg(short = 'n', long, default_value = "1", global = true)]
     calls_per_frame: usize,
 
-    /// The initial seed value. Can be a number, or
-    #[arg(short, long, value_parser = parse_seed, default_value = "reset", global = true)]
-    seed: Rng,
+    /// The initial seed value. Can be a number, or 'reset', 'beetom', 'sidehopper', or 'polyp'.
+    /// Defaults to 'reset'.
+    #[arg(short, long, value_parser = parse_seed, global = true)]
+    seed: Option<Rng>,
 
     #[command(subcommand)]
     command: Command,
@@ -47,7 +45,7 @@ fn parse_seed(seed: &str) -> Result<Rng, ParseIntError> {
 
 impl Args {
     fn rng(&self) -> Rng {
-        let mut rng = self.seed.clone();
+        let mut rng = self.seed.clone().unwrap_or(Rng::RESET);
         rng.calls_per_frame = self.calls_per_frame;
         rng.xba = self.xba.unwrap_or(rng.xba);
         rng
@@ -83,6 +81,51 @@ enum Command {
         /// Output numbers in hexadecimal.
         #[arg(long)]
         hex: bool,
+    },
+
+    /// Print drop chances for an enemy
+    Drops {
+        /// How many of the enemy are killed with a single shot.
+        #[arg(short, long, default_value = "1")]
+        count: u32,
+
+        /// Whether to ignore correlation between consecutive RNG calls.
+        #[arg(long)]
+        uncorrelated: bool,
+
+        /// Whether to pretend the game generates drops uniformly, instead of using a PRNG.
+        #[arg(long, conflicts_with = "uncorrelated")]
+        ideal: bool,
+
+        /// Output a histogram of drop chances instead of probabilities.
+        #[arg(long, conflicts_with = "uncorrelated", conflicts_with = "ideal")]
+        histogram: bool,
+
+        /// Only consider RNG seeds that are part of a loop.
+        /// You can optionally specify a loop ID as returned by `rng loops`.
+        ///
+        /// If no seed is specified, loop 0 of the reset seed is assumed automatically (the 2280 loop).
+        #[arg(
+            short,
+            long = "loop",
+            name = "loop",
+            default_missing_value = "0",
+            num_args = 0..=1
+        )]
+        loop_id: Option<usize>,
+
+        /// Only consider RNG seeds that are part of branch <BRANCH>, as returned by `rng loops`.
+        #[arg(short, long, conflicts_with = "loop")]
+        branch: Option<usize>,
+
+        /// Consider all 65536 RNG seeds, rather than just descendents of a given seed.
+        ///
+        /// In most circumstances, you want `--all_seeds` when you use `--xba`.
+        #[arg(short, long, conflicts_with = "branch", conflicts_with = "loop")]
+        all_seeds: bool,
+
+        /// The enemy name.
+        enemy: String,
     },
 }
 
@@ -135,5 +178,128 @@ fn main() {
                 }
             }
         }
+        Command::Drops {
+            count,
+            uncorrelated,
+            ideal,
+            histogram,
+            mut loop_id,
+            branch,
+            all_seeds,
+            ref enemy,
+        } => {
+            let Some(drop_table) = drops::ENEMY_DROPS.get(enemy) else {
+                eprintln!("Unknown enemy {enemy}");
+                exit(2)
+            };
+
+            if loop_id.is_none() && branch.is_none() && !all_seeds && args.seed.is_none() {
+                loop_id = Some(0);
+            }
+            let rng = args.rng();
+
+            let seeds: Vec<u16> = if all_seeds {
+                (0..=u16::MAX).collect()
+            } else if let Some(loop_id) = loop_id {
+                let mut analysis = args.rng().analyze();
+                let Some(l) = analysis.loops.get_mut(loop_id) else {
+                    eprintln!("Loop index out of range 0..={}", analysis.loops.len());
+                    exit(2);
+                };
+                std::mem::take(&mut l.seeds)
+            } else if let Some(branch_id) = branch {
+                let mut analysis = args.rng().analyze();
+                let Some(b) = analysis.branches.get_mut(branch_id) else {
+                    eprintln!("Branch index out of range 0..={}", analysis.branches.len());
+                    exit(2);
+                };
+                std::mem::take(&mut b.seeds)
+            } else {
+                rng.seeds_until_loop().collect()
+            };
+
+            let possible_drops = DropSet::ALL;
+
+            if histogram {
+                let mut histogram = HashMap::<DropAnalysis, u32>::new();
+                for &seed in &seeds {
+                    let analysis = drops::analysis::analyze_correlated(
+                        drop_table,
+                        &possible_drops,
+                        count,
+                        rng.clone(),
+                        std::iter::once(seed),
+                    );
+                    *histogram.entry(analysis).or_default() += 1;
+                }
+
+                let mut histogram: Vec<_> = histogram.into_iter().collect();
+                histogram.sort_by_key(|(_, count)| u32::MAX - *count);
+
+                println!("#            | Small E|   Big E| Missile|   Super|      PB");
+                println!("-------------+--------+--------+--------+--------+--------");
+                for (entry, count) in histogram {
+                    println!(
+                        "{:>5} ({}%)|{:>8}|{:>8}|{:>8}|{:>8}|{:>8}",
+                        count,
+                        format_percentage(count, seeds.len() as u32),
+                        entry.small_energy,
+                        entry.big_energy,
+                        entry.missile,
+                        entry.super_missile,
+                        entry.power_bomb,
+                    )
+                }
+            } else if ideal {
+                let print_stat = |name, drop| {
+                    let prob = drop_table.ideal_drops_per_farm(drop, &possible_drops, count);
+                    println!("{name:>8} | {prob:.3}");
+                };
+
+                println!("Resource | Drops");
+                println!("---------+------");
+                print_stat("Small E", Drop::SmallEnergy);
+                print_stat("Big E", Drop::BigEnergy);
+                print_stat("Missile", Drop::Missile);
+                print_stat("Super", Drop::SuperMissile);
+                print_stat("PB", Drop::PowerBomb);
+            } else {
+                let analysis = if uncorrelated {
+                    drops::analysis::analyze_uncorrelated(drop_table, &possible_drops, count, seeds)
+                } else {
+                    drops::analysis::analyze_correlated(
+                        drop_table,
+                        &possible_drops,
+                        count,
+                        rng.clone(),
+                        seeds,
+                    )
+                };
+
+                let print_stat =
+                    |name, stat| println!("{name:>8} | {:.3}", stat as f32 / analysis.seeds as f32);
+
+                println!("Resource | Drops");
+                println!("---------+------");
+                print_stat("Small E", analysis.small_energy);
+                print_stat("Big E", analysis.big_energy);
+                print_stat("Missile", analysis.missile);
+                print_stat("Super", analysis.super_missile);
+                print_stat("PB", analysis.power_bomb);
+            }
+        }
     }
+}
+
+fn format_percentage(num: u32, denom: u32) -> String {
+    let percentage = (num as f32) / (denom as f32) * 100.;
+
+    let digits_before_decimal = (percentage.floor() + 0.1).log10().max(1.).ceil() as usize;
+    let digits_after_decimal = 3 - digits_before_decimal;
+    format!(
+        "{:b$.a$}",
+        percentage,
+        b = digits_before_decimal,
+        a = digits_after_decimal
+    )
 }

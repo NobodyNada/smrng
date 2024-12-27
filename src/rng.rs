@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use serde::Serialize;
 
 pub fn rng1(seed: u16) -> u16 {
@@ -43,6 +45,30 @@ impl Rng {
         }
         if self.xba {
             self.seed = self.seed.swap_bytes();
+        }
+    }
+
+    pub fn seeds_until_loop(&self) -> impl Iterator<Item = u16> {
+        struct State {
+            seen: HashSet<u16>,
+            cur: Rng,
+        }
+        impl Iterator for State {
+            type Item = u16;
+
+            fn next(&mut self) -> Option<Self::Item> {
+                let seed = self.cur.seed;
+                if self.seen.insert(seed) {
+                    self.cur.frame_advance();
+                    Some(seed)
+                } else {
+                    None
+                }
+            }
+        }
+        State {
+            seen: HashSet::new(),
+            cur: self.clone(),
         }
     }
 

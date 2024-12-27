@@ -1,0 +1,776 @@
+{
+  "alcoon": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 254
+  },
+  "atomic": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 165,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "beetom": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 254
+  },
+  "sidehopperBlue": {
+    "nothing": 100,
+    "small_energy": 20,
+    "big_energy": 20,
+    "missile": 55,
+    "super_missile": 55,
+    "power_bomb": 5
+  },
+  "boulder": {
+    "nothing": 255,
+    "small_energy": 0,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 0
+  },
+  "boyon": {
+    "nothing": 130,
+    "small_energy": 20,
+    "big_energy": 10,
+    "missile": 85,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "bull": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 5,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 250
+  },
+  "cacatac": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 1,
+    "missile": 0,
+    "super_missile": 254,
+    "power_bomb": 0
+  },
+  "choot": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "covern": {
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 95,
+    "missile": 70,
+    "super_missile": 20,
+    "power_bomb": 20
+  },
+  "dessgeega": {
+    "nothing": 95,
+    "small_energy": 80,
+    "big_energy": 20,
+    "missile": 50,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "dragon": {
+    "nothing": 75,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 70,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "evir": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "fireflea": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 1,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 254
+  },
+  "fune": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "gamet": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "geega": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "geemerBlue": {
+    "nothing": 0,
+    "small_energy": 55,
+    "big_energy": 25,
+    "missile": 170,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "geemerGray": {
+    "nothing": 100,
+    "small_energy": 130,
+    "big_energy": 20,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 5
+  },
+  "geemerOrange": {
+    "nothing": 100,
+    "small_energy": 130,
+    "big_energy": 20,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 5
+  },
+  "geruta": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "holtz": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 120,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 35
+  },
+  "kago": {
+    "nothing": 5,
+    "small_energy": 50,
+    "big_energy": 90,
+    "missile": 70,
+    "super_missile": 20,
+    "power_bomb": 20
+  },
+  "kamer": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "kihunterGreen": {
+    "nothing": 75,
+    "small_energy": 50,
+    "big_energy": 30,
+    "missile": 80,
+    "super_missile": 10,
+    "power_bomb": 10
+  },
+  "kihunterRed": {
+    "nothing": 20,
+    "small_energy": 35,
+    "big_energy": 120,
+    "missile": 10,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "kihunterYellow": {
+    "nothing": 40,
+    "small_energy": 55,
+    "big_energy": 80,
+    "missile": 10,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "magdollite": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "mella": {
+    "nothing": 70,
+    "small_energy": 70,
+    "big_energy": 30,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "mellow": {
+    "nothing": 70,
+    "small_energy": 30,
+    "big_energy": 70,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "menu": {
+    "nothing": 80,
+    "small_energy": 70,
+    "big_energy": 20,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "metaree": {
+    "nothing": 60,
+    "small_energy": 80,
+    "big_energy": 25,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "metroid": {
+    "count": 5,
+    "nothing": 10,
+    "small_energy": 25,
+    "big_energy": 50,
+    "missile": 90,
+    "super_missile": 50,
+    "power_bomb": 30,
+    "extra": "metroid"
+  },
+  "minikraid": {
+    "count": 4,
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 1,
+    "missile": 0,
+    "super_missile": 254,
+    "power_bomb": 0,
+    "extra": "minikraid"
+  },
+  "mochtroid": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "multiviola": {
+    "nothing": 70,
+    "small_energy": 70,
+    "big_energy": 30,
+    "missile": 75,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "namihe": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "oum": {
+    "nothing": 75,
+    "small_energy": 70,
+    "big_energy": 30,
+    "missile": 70,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "owtch": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "powamp": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 254,
+    "power_bomb": 0
+  },
+  "puromi": {
+    "nothing": 255,
+    "small_energy": 0,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 0
+  },
+  "puyo": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 10,
+    "power_bomb": 60
+  },
+  "reo": {
+    "nothing": 40,
+    "small_energy": 30,
+    "big_energy": 80,
+    "missile": 85,
+    "super_missile": 10,
+    "power_bomb": 10
+  },
+  "rinka": {
+    "nothing": 255,
+    "small_energy": 0,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 0
+  },
+  "ripper2Green": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 1,
+    "missile": 0,
+    "super_missile": 254,
+    "power_bomb": 0
+  },
+  "ripper2Red": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 1,
+    "missile": 0,
+    "super_missile": 254,
+    "power_bomb": 0
+  },
+  "ripper": {
+    "nothing": 65,
+    "small_energy": 80,
+    "big_energy": 20,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "sciser": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 100,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 154
+  },
+  "shaktool": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "sidehopper": {
+    "nothing": 100,
+    "small_energy": 20,
+    "big_energy": 20,
+    "missile": 55,
+    "super_missile": 55,
+    "power_bomb": 5
+  },
+  "skree": {
+    "nothing": 137,
+    "small_energy": 20,
+    "big_energy": 3,
+    "missile": 85,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "skultera": {
+    "nothing": 70,
+    "small_energy": 80,
+    "big_energy": 30,
+    "missile": 70,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "dessgeegaSmall": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 254
+  },
+  "sidehopperSmall": {
+    "nothing": 100,
+    "small_energy": 20,
+    "big_energy": 40,
+    "missile": 85,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "sova": {
+    "nothing": 25,
+    "small_energy": 80,
+    "big_energy": 70,
+    "missile": 30,
+    "super_missile": 50,
+    "power_bomb": 0
+  },
+  "spacePirateGrayStanding": {
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 120,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "spacePirateGrayWall": {
+    "nothing": 1,
+    "small_energy": 10,
+    "big_energy": 45,
+    "missile": 197,
+    "super_missile": 1,
+    "power_bomb": 1
+  },
+  "spacePirateGreen": {
+    "nothing": 45,
+    "small_energy": 50,
+    "big_energy": 30,
+    "missile": 100,
+    "super_missile": 20,
+    "power_bomb": 10
+  },
+  "spacePiratePinkStanding": {
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 120,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "spacePiratePinkWall": {
+    "nothing": 70,
+    "small_energy": 30,
+    "big_energy": 70,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "spacePirateRed": {
+    "nothing": 195,
+    "small_energy": 10,
+    "big_energy": 20,
+    "missile": 20,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "spacePirateYellowStanding": {
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 120,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 0
+  },
+  "spacePirateYellowWall": {
+    "nothing": 195,
+    "small_energy": 10,
+    "big_energy": 20,
+    "missile": 20,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "spacePirateSilver": {
+    "count": 5,
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 150,
+    "missile": 5,
+    "super_missile": 100,
+    "power_bomb": 0
+  },
+  "spacePirateTourian": {
+    "nothing": 255,
+    "small_energy": 0,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 0
+  },
+  "squeept": {
+    "nothing": 5,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 50
+  },
+  "tatori": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "tatoriBaby": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "tripper": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "viola": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 254
+  },
+  "waver": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "workrobot": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "yappingmaw": {
+    "nothing": 5,
+    "small_energy": 80,
+    "big_energy": 80,
+    "missile": 80,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "yard": {
+    "nothing": 80,
+    "small_energy": 85,
+    "big_energy": 80,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 10
+  },
+  "zeb": {
+    "nothing": 5,
+    "small_energy": 60,
+    "big_energy": 60,
+    "missile": 60,
+    "super_missile": 60,
+    "power_bomb": 10
+  },
+  "zebbo": {
+    "nothing": 0,
+    "small_energy": 0,
+    "big_energy": 140,
+    "missile": 10,
+    "super_missile": 100,
+    "power_bomb": 5
+  },
+  "zeela": {
+    "nothing": 0,
+    "small_energy": 55,
+    "big_energy": 25,
+    "missile": 125,
+    "super_missile": 50,
+    "power_bomb": 0
+  },
+  "zero": {
+    "nothing": 0,
+    "small_energy": 1,
+    "big_energy": 0,
+    "missile": 0,
+    "super_missile": 0,
+    "power_bomb": 254
+  },
+  "zoa": {
+    "nothing": 5,
+    "small_energy": 0,
+    "big_energy": 100,
+    "missile": 70,
+    "super_missile": 70,
+    "power_bomb": 10
+  },
+  "btBalls": {
+    "nothing": 55,
+    "small_energy": 115,
+    "big_energy": 20,
+    "missile": 65,
+    "super_missile": 0,
+    "power_bomb": 0
+  },
+  "spospoSpore": {
+    "nothing": 25,
+    "small_energy": 10,
+    "big_energy": 20,
+    "missile": 200,
+    "super_missile": 0,
+    "power_bomb": 0
+  },
+  "kraidTalon": {
+    "nothing": 0,
+    "small_energy": 10,
+    "big_energy": 35,
+    "missile": 200,
+    "super_missile": 10,
+    "power_bomb": 0
+  },
+  "crocBalls": {
+    "nothing": 5,
+    "small_energy": 0,
+    "big_energy": 120,
+    "missile": 100,
+    "super_missile": 20,
+    "power_bomb": 10
+  },
+  "phantoonFlame": {
+    "nothing": 105,
+    "small_energy": 20,
+    "big_energy": 20,
+    "missile": 100,
+    "super_missile": 10,
+    "power_bomb": 0
+  },
+  "draygonGoop": {
+    "nothing": 100,
+    "small_energy": 5,
+    "big_energy": 30,
+    "missile": 110,
+    "super_missile": 5,
+    "power_bomb": 5
+  },
+  "gtBalls": {
+    "nothing": 60,
+    "small_energy": 30,
+    "big_energy": 30,
+    "missile": 50,
+    "super_missile": 85,
+    "power_bomb": 0
+  },
+  "bombtorizo": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "goldentorizo": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "sporespawn": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "kraid": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "phantoon": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "draygon": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "ridley": {
+    "count": 16,
+    "nothing": 0,
+    "small_energy": 50,
+    "big_energy": 50,
+    "missile": 50,
+    "super_missile": 50,
+    "power_bomb": 55
+  },
+  "crocomire": {
+    "count": 16,
+    "nothing": 5,
+    "small_energy": 0,
+    "big_energy": 130,
+    "missile": 60,
+    "super_missile": 30,
+    "power_bomb": 30
+  },
+  "botwoon": {
+    "count": 16,
+    "nothing": 5,
+    "small_energy": 0,
+    "big_energy": 120,
+    "missile": 100,
+    "super_missile": 20,
+    "power_bomb": 10
+  }
+}
