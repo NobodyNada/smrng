@@ -116,7 +116,7 @@ $ smrng drops minikraid --histogram
    65 (2.85%)|       0|       1|       0|       4|       0
 
 # All possible drop combinations, from all possible seeds
-$ smrng drops minikraid --histogram
+$ smrng drops minikraid --histogram --all-seeds
 #            | Small E|   Big E| Missile|   Super|      PB
 -------------+--------+--------+--------+--------+--------
 64226 (98.0%)|       0|       0|       0|       5|       0
