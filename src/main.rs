@@ -124,6 +124,22 @@ enum Command {
         #[arg(short, long, conflicts_with = "branch", conflicts_with = "loop")]
         all_seeds: bool,
 
+        /// The player is full on energy.
+        #[arg(short = 'e')]
+        full_energy: bool,
+
+        /// The player is full on missiles.
+        #[arg(short = 'm', long)]
+        full_missiles: bool,
+
+        /// The player is full on super missiles.
+        #[arg(short = 'u', long)]
+        full_supers: bool,
+
+        /// The player is full on power bombs.
+        #[arg(short = 'p', long)]
+        full_pbs: bool,
+
         /// The enemy name.
         enemy: String,
     },
@@ -187,6 +203,10 @@ fn main() {
             branch,
             all_seeds,
             ref enemy,
+            full_energy,
+            full_missiles,
+            full_supers,
+            full_pbs,
         } => {
             let Some(drop_table) = drops::ENEMY_DROPS.get(enemy) else {
                 eprintln!("Unknown enemy {enemy}");
@@ -218,7 +238,19 @@ fn main() {
                 rng.seeds_until_loop().collect()
             };
 
-            let possible_drops = DropSet::ALL;
+            let mut possible_drops = DropSet::ALL;
+            if full_energy {
+                possible_drops -= &DropSet::from_iter([Drop::SmallEnergy, Drop::BigEnergy]);
+            }
+            if full_missiles {
+                possible_drops -= &DropSet::from_iter([Drop::Missile]);
+            }
+            if full_supers {
+                possible_drops -= &DropSet::from_iter([Drop::SuperMissile]);
+            }
+            if full_pbs {
+                possible_drops -= &DropSet::from_iter([Drop::PowerBomb]);
+            }
 
             if histogram {
                 let mut histogram = HashMap::<DropAnalysis, u32>::new();

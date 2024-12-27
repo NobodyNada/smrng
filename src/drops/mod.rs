@@ -2,7 +2,7 @@ pub mod analysis;
 
 use std::{
     collections::HashMap,
-    ops::{BitAnd, BitOr, BitXor, Index, Sub},
+    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Index, Sub, SubAssign},
     sync::LazyLock,
 };
 
@@ -156,10 +156,20 @@ impl BitAnd<&DropSet> for DropSet {
         self.intersection(rhs)
     }
 }
+impl BitAndAssign<&DropSet> for DropSet {
+    fn bitand_assign(&mut self, rhs: &DropSet) {
+        *self = std::mem::take(self) & rhs;
+    }
+}
 impl BitOr<&DropSet> for DropSet {
     type Output = DropSet;
     fn bitor(self, rhs: &DropSet) -> Self::Output {
         self.union(rhs)
+    }
+}
+impl BitOrAssign<&DropSet> for DropSet {
+    fn bitor_assign(&mut self, rhs: &DropSet) {
+        *self = std::mem::take(self) | rhs;
     }
 }
 impl BitXor<&DropSet> for DropSet {
@@ -168,10 +178,20 @@ impl BitXor<&DropSet> for DropSet {
         self.symmetric_difference(rhs)
     }
 }
+impl BitXorAssign<&DropSet> for DropSet {
+    fn bitxor_assign(&mut self, rhs: &DropSet) {
+        *self = std::mem::take(self) ^ rhs;
+    }
+}
 impl Sub<&DropSet> for DropSet {
     type Output = DropSet;
     fn sub(self, rhs: &DropSet) -> Self::Output {
         self.difference(rhs)
+    }
+}
+impl SubAssign<&DropSet> for DropSet {
+    fn sub_assign(&mut self, rhs: &DropSet) {
+        *self = std::mem::take(self) - rhs;
     }
 }
 
@@ -305,7 +325,7 @@ impl DropTable {
                 .map(|d| self[d])
                 .sum::<u8>() as u16;
 
-        let chance = if drop.is_major() {
+        let chance = if !drop.is_major() {
             self[drop] as u16 * pooled_major_complement / pooled_minor
         } else {
             self[drop] as u16
@@ -339,14 +359,14 @@ impl DropTable {
                 .sum::<u8>() as u16;
 
         let mut acc = 0;
-        for drop in DropSet::MINOR {
+        for drop in possible_drops.intersection(&DropSet::MINOR) {
             acc += (self[drop] as u16) * pooled_major_complement / pooled_minor;
             if acc >= random {
                 return drop;
             }
         }
 
-        for drop in DropSet::MAJOR {
+        for drop in possible_drops.intersection(&DropSet::MAJOR) {
             acc += self[drop] as u16;
             if acc >= random {
                 return drop;
