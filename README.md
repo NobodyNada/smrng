@@ -22,6 +22,12 @@ Options:
           Print help
 ```
 
+# Installation
+
+```
+$ cargo install smrng
+```
+
 # Examples
 
 ### Print information about RNG loops from a reset state
