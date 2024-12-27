@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "A simple command line tool for printing information about RNG loops and drop chances in Super Metroid"
 license = "CC0-1.0"
+repository = "https://github.com/NobodyNada/smrng"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
