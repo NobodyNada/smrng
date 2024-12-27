@@ -1,5 +1,5 @@
-use ::rng::*;
-use drops::{analysis::DropAnalysis, Drop, DropSet};
+use ::smrng::drops::{analysis::DropAnalysis, Drop, DropSet};
+use ::smrng::*;
 
 use clap::{builder::BoolishValueParser, Parser, Subcommand};
 use std::{collections::HashMap, num::ParseIntError, process::exit};
