@@ -1,6 +1,6 @@
 [package]
 name = "smrng"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A simple command line tool for printing information about RNG loops and drop chances in Super Metroid"
 license = "CC0-1.0"
