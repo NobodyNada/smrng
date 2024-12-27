@@ -11,9 +11,12 @@ use serde::Deserialize;
 use crate::Rng;
 
 const ENEMY_DROPS_JSON: &str = include_str!("enemy_drops.json");
+
+/// The drop table for enemies in vanilla SM.
 pub static ENEMY_DROPS: LazyLock<HashMap<String, DropTable>> =
     LazyLock::new(|| serde_json::from_str(ENEMY_DROPS_JSON).unwrap());
 
+/// A drop type.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Drop {
     Nothing,
@@ -25,6 +28,7 @@ pub enum Drop {
 }
 
 impl Drop {
+    /// Whether this is considered a "Tier 2" drop.
     pub const fn is_major(&self) -> bool {
         use self::Drop::*;
         match self {
@@ -59,6 +63,7 @@ impl Drop {
     }
 }
 
+/// A set of drops.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct DropSet(u8);
 
@@ -208,6 +213,7 @@ impl Iterator for DropSetIterator {
     }
 }
 
+/// A table of an enemy's drop chances.
 #[derive(Deserialize)]
 pub struct DropTable {
     pub nothing: u8,
@@ -217,9 +223,11 @@ pub struct DropTable {
     pub super_missile: u8,
     pub power_bomb: u8,
 
+    /// If this enemy calls a multi-drop routine, the number of drops to generate.
     #[serde(default)]
     pub count: Option<u32>,
 
+    /// The type of explosion animation, if this enemy's explosion generates an extra drop.
     #[serde(default)]
     pub extra: Option<ExplosionDrop>,
 }
@@ -232,10 +240,12 @@ pub enum ExplosionDrop {
 }
 
 impl ExplosionDrop {
+    /// The number of frames between explosions.
     pub fn explosion_interval(&self) -> u32 {
         8
     }
 
+    /// The number of explosions before generating the final drop.
     pub fn num_explosions(&self) -> u32 {
         match self {
             ExplosionDrop::Metroid => 5,
@@ -243,6 +253,7 @@ impl ExplosionDrop {
         }
     }
 
+    /// The number of RNG calls per explosion.
     pub fn rng_per_explosion(&self) -> u32 {
         match self {
             ExplosionDrop::Metroid => 2,
@@ -267,10 +278,15 @@ impl Index<self::Drop> for DropTable {
 }
 
 impl DropTable {
+    /// Returns the raw drop chance for a given drop.
     pub fn get(&self, drop: Drop) -> u8 {
         self[drop]
     }
 
+    /// Calculates ideal drops based purely on probabilities in the drop table.
+    ///
+    /// Returns the expected number of times `drop` will be dropped after farming this enemy
+    /// `farms` times.
     pub fn ideal_drops_per_farm(&self, drop: Drop, possible_drops: &DropSet, farms: u32) -> f32 {
         if !possible_drops.contains(&drop) {
             return 0.;
@@ -300,6 +316,7 @@ impl DropTable {
             * farms as f32
     }
 
+    /// Simulates a single drop (even if this enemy drops multiple items).
     pub fn roll_one(&self, rng: &mut Rng, possible_drops: &DropSet) -> Drop {
         let random = loop {
             match rng.roll() as u8 {
@@ -339,6 +356,7 @@ impl DropTable {
         Drop::Nothing
     }
 
+    /// Simulates this enemy's drops.
     pub fn roll<'a>(
         &'a self,
         rng: &'a mut Rng,
@@ -347,6 +365,7 @@ impl DropTable {
         self.roll_multiple(rng, possible_drops, 1)
     }
 
+    /// Simulates the drops obtained by farming multiple of this enemy in a single frame.
     pub fn roll_multiple<'a>(
         &'a self,
         rng: &'a mut Rng,

@@ -2,9 +2,12 @@ use crate::Rng;
 
 use super::{Drop, DropSet, DropTable};
 
+/// The simulated results of farming an enemy across a set of seeds.
 #[derive(Default, PartialEq, Eq, Hash)]
 pub struct DropAnalysis {
+    /// The number of seeds sampled.
     pub seeds: u32,
+
     pub nothing: u32,
     pub small_energy: u32,
     pub big_energy: u32,
@@ -26,6 +29,8 @@ impl DropAnalysis {
     }
 }
 
+/// Generates a `DropAnalysis` for a set of seeds, simulating the actual RNG behavior (including
+/// correlation between successive calls).
 pub fn analyze_correlated(
     table: &DropTable,
     possible_drops: &DropSet,
@@ -46,6 +51,8 @@ pub fn analyze_correlated(
     analysis
 }
 
+/// Generates a `DropAnalysis` for a set of seeds; simulating RNG distribution across the given set
+/// of seeds, but assuming successive calls are independent.
 pub fn analyze_uncorrelated<S: IntoIterator<Item = u16>>(
     table: &DropTable,
     possible_drops: &DropSet,

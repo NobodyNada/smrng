@@ -2,37 +2,54 @@ use serde::Serialize;
 
 use crate::Rng;
 
+/// The structure of RNG loops and branches given a particular RNG configuration.
+///
+/// Every RNG seed can be classified as part of either a loop (a cyclic set of seeds) or a branch
+/// (eventually leading into a loop).
 #[derive(Serialize)]
 pub struct Analysis {
+    /// The RNG configuration under analysis.
     pub rng: Rng,
+
+    /// The behavior of all possible seeds with this RNG configuration.
     pub seeds: Vec<SeedInfo>,
+
+    /// A list of all RNG branches.
     pub branches: Vec<BranchInfo>,
+
+    /// A list of all RNG seeds.
     pub loops: Vec<LoopInfo>,
 }
 
+/// Whether a given RNG seed is a branch or a loop.
 #[derive(Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum SeedInfo {
     Branch { id: u16 },
     Loop { id: u16 },
 }
 
+/// A branch is a set of RNG seeds that are not themselves part of a loop,
+/// but eventually lead into one.
 #[derive(Serialize)]
 pub struct BranchInfo {
     pub seeds: Vec<u16>,
     pub loop_id: u16,
 }
 
+/// A loop is a set of RNG seeds that form a cycle.
 #[derive(Serialize)]
 pub struct LoopInfo {
     pub seeds: Vec<u16>,
 }
 
 impl Rng {
+    /// Performs loop analysis on this RNG to determine all possible loops and branches.
     pub fn analyze(&self) -> Analysis {
         let mut seeds = [Option::<SeedInfo>::None; 0x10000];
         let mut branches = Vec::new();
         let mut loops = Vec::new();
 
+        // Check the starting seed first, so that it gets assigned branch 0 and loop 0.
         for start in std::iter::once(self.seed).chain(0..=0xFFFFu16) {
             if seeds[start as usize].is_some() {
                 continue;
