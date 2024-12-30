@@ -1,5 +1,6 @@
 use ::smrng::drops::{analysis::DropAnalysis, Drop, DropSet};
 use ::smrng::*;
+use serde::Serialize;
 
 use clap::{builder::BoolishValueParser, Parser, Subcommand};
 use std::{collections::HashMap, num::ParseIntError, process::exit};
@@ -18,6 +19,10 @@ struct Args {
     /// Defaults to 'reset'.
     #[arg(short, long, value_parser = parse_seed, global = true)]
     seed: Option<Rng>,
+
+    /// Output in JSON format.
+    #[arg(short, long, global = true)]
+    json: bool,
 
     #[command(subcommand)]
     command: Command,
@@ -55,11 +60,7 @@ impl Args {
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Print information about RNG loops and branches.
-    Loops {
-        /// Output in JSON format.
-        #[arg(short, long)]
-        json: bool,
-    },
+    Loops,
 
     /// Print generated random numbers to standard output.
     Dump {
@@ -79,7 +80,7 @@ enum Command {
         branch: Option<usize>,
 
         /// Output numbers in hexadecimal.
-        #[arg(long)]
+        #[arg(long, conflicts_with = "json")]
         hex: bool,
     },
 
@@ -148,10 +149,10 @@ enum Command {
 fn main() {
     let args = Args::parse();
     match args.command {
-        Command::Loops { json } => {
+        Command::Loops => {
             let analysis = args.rng().analyze();
-            if json {
-                println!("{}", serde_json::to_string_pretty(&analysis).unwrap());
+            if args.json {
+                serde_json::to_writer(std::io::stdout(), &analysis).unwrap();
             } else {
                 analysis.print();
             }
@@ -161,13 +162,7 @@ fn main() {
             branch,
             hex,
         } => {
-            let print = |seed| {
-                if hex {
-                    println!("{seed:#06x}");
-                } else {
-                    println!("{seed}");
-                }
-            };
+            let mut output = Vec::new();
 
             if let Some(loop_id) = loop_id {
                 let analysis = args.rng().analyze();
@@ -175,22 +170,33 @@ fn main() {
                     eprintln!("Loop index out of range 0..={}", analysis.loops.len());
                     exit(2);
                 };
-                l.seeds.iter().copied().for_each(print);
+                output = l.seeds.to_vec();
             } else if let Some(branch_id) = branch {
                 let analysis = args.rng().analyze();
                 let Some(b) = analysis.branches.get(branch_id) else {
                     eprintln!("Branch index out of range 0..={}", analysis.branches.len());
                     exit(2);
                 };
-                b.seeds.iter().copied().for_each(print);
+                output = b.seeds.to_vec();
             } else {
                 let mut seen = vec![false; 0x10000];
                 let mut rng = args.rng();
 
                 while !seen[rng.seed as usize] {
-                    print(rng.seed);
+                    output.push(rng.seed);
                     seen[rng.seed as usize] = true;
                     rng.frame_advance();
+                }
+            }
+            if args.json {
+                serde_json::to_writer(std::io::stdout(), &output).unwrap();
+            } else {
+                for seed in output {
+                    if hex {
+                        println!("{seed:#06x}");
+                    } else {
+                        println!("{seed}");
+                    }
                 }
             }
         }
@@ -265,36 +271,65 @@ fn main() {
                     *histogram.entry(analysis).or_default() += 1;
                 }
 
-                let mut histogram: Vec<_> = histogram.into_iter().collect();
-                histogram.sort_by_key(|(_, count)| u32::MAX - *count);
+                let mut histogram: Vec<_> = histogram
+                    .into_iter()
+                    .map(|(entry, count)| DropAnalysis {
+                        seeds: count,
+                        ..entry
+                    })
+                    .collect();
+                histogram.sort_by_key(|DropAnalysis { seeds, .. }| u32::MAX - *seeds);
 
-                println!("#            | Small E|   Big E| Missile|   Super|      PB");
-                println!("-------------+--------+--------+--------+--------+--------");
-                for (entry, count) in histogram {
-                    println!(
-                        "{:>5} ({}%)|{:>8}|{:>8}|{:>8}|{:>8}|{:>8}",
-                        count,
-                        format_percentage(count, seeds.len() as u32),
-                        entry.small_energy,
-                        entry.big_energy,
-                        entry.missile,
-                        entry.super_missile,
-                        entry.power_bomb,
-                    )
+                if args.json {
+                    serde_json::to_writer(std::io::stdout(), &histogram).unwrap();
+                } else {
+                    println!("#            | Small E|   Big E| Missile|   Super|      PB");
+                    println!("-------------+--------+--------+--------+--------+--------");
+                    for entry in histogram {
+                        println!(
+                            "{:>5} ({}%)|{:>8}|{:>8}|{:>8}|{:>8}|{:>8}",
+                            count,
+                            format_percentage(count, seeds.len() as u32),
+                            entry.small_energy,
+                            entry.big_energy,
+                            entry.missile,
+                            entry.super_missile,
+                            entry.power_bomb,
+                        )
+                    }
                 }
             } else if ideal {
-                let print_stat = |name, drop| {
-                    let prob = drop_table.ideal_drops_per_farm(drop, &possible_drops, count);
-                    println!("{name:>8} | {prob:.3}");
-                };
+                let get_stat = |drop| drop_table.ideal_drops_per_farm(drop, &possible_drops, count);
 
-                println!("Resource | Drops");
-                println!("---------+------");
-                print_stat("Small E", Drop::SmallEnergy);
-                print_stat("Big E", Drop::BigEnergy);
-                print_stat("Missile", Drop::Missile);
-                print_stat("Super", Drop::SuperMissile);
-                print_stat("PB", Drop::PowerBomb);
+                if args.json {
+                    #[derive(Serialize)]
+                    struct Output {
+                        small_energy: f32,
+                        big_energy: f32,
+                        missile: f32,
+                        super_missile: f32,
+                        power_bomb: f32,
+                    }
+
+                    let output = Output {
+                        small_energy: get_stat(Drop::SmallEnergy),
+                        big_energy: get_stat(Drop::BigEnergy),
+                        missile: get_stat(Drop::Missile),
+                        super_missile: get_stat(Drop::SuperMissile),
+                        power_bomb: get_stat(Drop::PowerBomb),
+                    };
+                    serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+                } else {
+                    let print_stat = |name, drop| println!("{name:>8} | {:.3}", get_stat(drop));
+
+                    println!("Resource | Drops");
+                    println!("---------+------");
+                    print_stat("Small E", Drop::SmallEnergy);
+                    print_stat("Big E", Drop::BigEnergy);
+                    print_stat("Missile", Drop::Missile);
+                    print_stat("Super", Drop::SuperMissile);
+                    print_stat("PB", Drop::PowerBomb);
+                };
             } else {
                 let analysis = if uncorrelated {
                     drops::analysis::analyze_uncorrelated(drop_table, &possible_drops, count, seeds)
@@ -308,16 +343,21 @@ fn main() {
                     )
                 };
 
-                let print_stat =
-                    |name, stat| println!("{name:>8} | {:.3}", stat as f32 / analysis.seeds as f32);
+                if args.json {
+                    serde_json::to_writer_pretty(std::io::stdout(), &analysis).unwrap();
+                } else {
+                    let print_stat = |name, stat| {
+                        println!("{name:>8} | {:.3}", stat as f32 / analysis.seeds as f32)
+                    };
 
-                println!("Resource | Drops");
-                println!("---------+------");
-                print_stat("Small E", analysis.small_energy);
-                print_stat("Big E", analysis.big_energy);
-                print_stat("Missile", analysis.missile);
-                print_stat("Super", analysis.super_missile);
-                print_stat("PB", analysis.power_bomb);
+                    println!("Resource | Drops");
+                    println!("---------+------");
+                    print_stat("Small E", analysis.small_energy);
+                    print_stat("Big E", analysis.big_energy);
+                    print_stat("Missile", analysis.missile);
+                    print_stat("Super", analysis.super_missile);
+                    print_stat("PB", analysis.power_bomb);
+                }
             }
         }
     }
