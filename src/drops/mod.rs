@@ -360,7 +360,9 @@ impl DropTable {
 
         let mut acc = 0;
         for drop in possible_drops.intersection(&DropSet::MINOR) {
-            acc += (self[drop] as u16) * pooled_major_complement / pooled_minor;
+            if pooled_minor != 0 {
+                acc += (self[drop] as u16) * pooled_major_complement / pooled_minor;
+            }
             if acc >= random {
                 return drop;
             }
