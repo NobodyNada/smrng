@@ -288,8 +288,8 @@ fn main() {
                     for entry in histogram {
                         println!(
                             "{:>5} ({}%)|{:>8}|{:>8}|{:>8}|{:>8}|{:>8}",
-                            count,
-                            format_percentage(count, seeds.len() as u32),
+                            entry.seeds,
+                            format_percentage(entry.seeds, seeds.len() as u32),
                             entry.small_energy,
                             entry.big_energy,
                             entry.missile,
