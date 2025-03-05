@@ -141,6 +141,22 @@ enum Command {
         #[arg(short = 'p', long)]
         full_pbs: bool,
 
+        /// [histogram mode] Only include energy drops in the output.
+        #[arg(short = 'E', long, requires = "histogram")]
+        filter_energy: bool,
+
+        /// [histogram mode] Only include missiles drops in the output.
+        #[arg(short = 'M', long, requires = "histogram")]
+        filter_missiles: bool,
+
+        /// [histogram mode] Only include super missile drops in the output.
+        #[arg(short = 'S', long, requires = "histogram")]
+        filter_supers: bool,
+
+        /// [histogram mode] Only include power bomb drops in the output.
+        #[arg(short = 'P', long, requires = "histogram")]
+        filter_pbs: bool,
+
         /// The enemy name.
         enemy: String,
     },
@@ -213,6 +229,10 @@ fn main() {
             full_missiles,
             full_supers,
             full_pbs,
+            filter_energy,
+            filter_missiles,
+            filter_supers,
+            filter_pbs,
         } => {
             let Some(drop_table) = drops::ENEMY_DROPS.get(enemy) else {
                 eprintln!("Unknown enemy {enemy}");
@@ -259,15 +279,35 @@ fn main() {
             }
 
             if histogram {
+                let no_filters =
+                    !filter_energy && !filter_missiles && !filter_pbs && !filter_supers;
+                let include_energy = no_filters || filter_energy;
+                let include_missiles = no_filters || filter_missiles;
+                let include_supers = no_filters || filter_supers;
+                let include_pbs = no_filters || filter_pbs;
+
                 let mut histogram = HashMap::<DropAnalysis, u32>::new();
                 for &seed in &seeds {
-                    let analysis = drops::analysis::analyze_correlated(
+                    let mut analysis = drops::analysis::analyze_correlated(
                         drop_table,
                         &possible_drops,
                         count,
                         rng.clone(),
                         std::iter::once(seed),
                     );
+                    if !include_energy {
+                        analysis.small_energy = 0;
+                        analysis.big_energy = 0;
+                    }
+                    if !include_missiles {
+                        analysis.missile = 0;
+                    }
+                    if !include_supers {
+                        analysis.super_missile = 0;
+                    }
+                    if !include_pbs {
+                        analysis.power_bomb = 0;
+                    }
                     *histogram.entry(analysis).or_default() += 1;
                 }
 
@@ -283,19 +323,55 @@ fn main() {
                 if args.json {
                     serde_json::to_writer(std::io::stdout(), &histogram).unwrap();
                 } else {
-                    println!("#            | Small E|   Big E| Missile|   Super|      PB");
-                    println!("-------------+--------+--------+--------+--------+--------");
+                    print!("#            ");
+                    if include_energy {
+                        print!("| Small E|   Big E");
+                    }
+                    if include_missiles {
+                        print!("| Missile");
+                    }
+                    if include_supers {
+                        print!("|   Super");
+                    }
+                    if include_pbs {
+                        print!("|      PB");
+                    }
+                    println!();
+
+                    print!("-------------");
+                    if include_energy {
+                        print!("+--------+--------");
+                    }
+                    if include_missiles {
+                        print!("+--------");
+                    }
+                    if include_supers {
+                        print!("+--------");
+                    }
+                    if include_pbs {
+                        print!("+--------");
+                    }
+                    println!();
+
                     for entry in histogram {
-                        println!(
-                            "{:>5} ({}%)|{:>8}|{:>8}|{:>8}|{:>8}|{:>8}",
+                        print!(
+                            "{:>5} ({}%)",
                             entry.seeds,
                             format_percentage(entry.seeds, seeds.len() as u32),
-                            entry.small_energy,
-                            entry.big_energy,
-                            entry.missile,
-                            entry.super_missile,
-                            entry.power_bomb,
-                        )
+                        );
+                        if include_energy {
+                            print!("|{:>8}|{:>8}", entry.small_energy, entry.big_energy);
+                        }
+                        if include_missiles {
+                            print!("|{:>8}", entry.missile);
+                        }
+                        if include_supers {
+                            print!("|{:>8}", entry.super_missile);
+                        }
+                        if include_pbs {
+                            print!("|{:>8}", entry.power_bomb);
+                        }
+                        println!();
                     }
                 }
             } else if ideal {
