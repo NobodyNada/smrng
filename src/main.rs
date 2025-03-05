@@ -17,7 +17,7 @@ struct Args {
 
     /// The initial seed value. Can be a number, or 'reset', 'beetom', 'sidehopper', or 'polyp'.
     /// Defaults to 'reset'.
-    #[arg(short, long, value_parser = parse_seed, global = true)]
+    #[arg(short = 'i', long, value_parser = parse_seed, global = true)]
     seed: Option<Rng>,
 
     /// Output in JSON format.
@@ -134,7 +134,7 @@ enum Command {
         full_missiles: bool,
 
         /// The player is full on super missiles.
-        #[arg(short = 'u', long)]
+        #[arg(short = 's', long)]
         full_supers: bool,
 
         /// The player is full on power bombs.
