@@ -5,7 +5,7 @@ use crate::Rng;
 use super::{Drop, DropSet, DropTable};
 
 /// The simulated results of farming an enemy across a set of seeds.
-#[derive(Default, PartialEq, Eq, Hash, Serialize)]
+#[derive(Default, PartialEq, Eq, Hash, Serialize, Debug)]
 pub struct DropAnalysis {
     /// The number of seeds sampled.
     pub seeds: u32,

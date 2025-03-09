@@ -295,6 +295,7 @@ fn main() {
                         rng.clone(),
                         std::iter::once(seed),
                     );
+                    analysis.nothing = 0;
                     if !include_energy {
                         analysis.small_energy = 0;
                         analysis.big_energy = 0;
